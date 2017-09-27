@@ -898,14 +898,14 @@ function setupIndicatorStatePicToZero(){
     if(button_state_items_show_all === 0) {
         console.log('button_state_items_show_all ' + button_state_items_show_all);
         $(".indicator-pic").each(function () {
-            $(this).attr("data-state", "0");
+            $(this).attr("data-visibility", "0");
         });
     }
 }
 function changeIndicatorVisible(){
 	$(".indicator-pic").each(function(){
-	    console.log($(this).attr("data-state"));
-		if($(this).attr("data-state") === "0"){
+	    console.log($(this).attr("data-visibility"));
+		if($(this).attr("data-visibility") === "0"){
 			$(this).hide();
 		}else{
 			$(this).show();
@@ -958,13 +958,7 @@ $(function() {
         }
 
     });
-/*
-    $(".indicator-pic").each(function(){
-        if($(this).attr("data-state") == 0){
-            $(this).hide();
-        }
-    });
-*/
+
     $(".button-map-show-items-all").on("click", function(){
         console.log('button-map-show-all');
 
@@ -975,7 +969,7 @@ $(function() {
             $(this).find(".map-info-status-block-item-inner .unselected").hide();
             $(".indicator-pic").each(function(){
                 $(this).show();
-                $(this).attr("data-state", 1);
+                $(this).attr("data-visibility", 1);
             });
         }else{  //деактивация кнопки
             $(this).attr('data-selected', '0');
@@ -985,19 +979,20 @@ $(function() {
             var trigger_water_active = 0;
             $(".indicator-pic").each(function(){
                 if($(this).hasClass("system-water")){
-                    if($(this).attr("data-state") == 2){
+                    if($(this).attr("data-trigger-active") != 0){
                         trigger_water_active = 1;
                     }
                 }
             });
+            console.log('0000 trigger_water_active ' + trigger_water_active);
             $(".indicator-pic").each(function(){
                 if(!$(this).hasClass("system-water")){
                     $(this).hide();
-                    $(this).attr("data-state", 0);
+                    $(this).attr("data-visibility", 0);
                 }else{
-                    if(trigger_water_active == 0){
+                    if(trigger_water_active != 0 && $(this).attr("data-trigger-active") == 0){
                         $(this).hide();
-                        $(this).attr("data-state", 0);
+                        $(this).attr("data-visibility", 0);
                     }
                 }
             });
@@ -1143,7 +1138,8 @@ $(function() {
         };
         this.getColorFromState();
         this.applyIconParameters = function () {
-            $(".indicator-pic.system-"+this.class_element+" .col-right-item-pic-icon").attr("data-state", this.trigger_state);
+            $(".indicator-pic.system-"+this.class_element).attr("data-trigger-active", this.trigger_state);
+            //$(".indicator-pic.system-"+this.class_element+" .col-right-item-pic-icon").attr("data-trigger-active", this.trigger_state);
             $(".indicator-pic.system-"+this.class_element+" .col-right-item-pic-icon").css('background', this.indicator_color);
         };
         this.applyIconParameters();
@@ -1167,26 +1163,19 @@ $(function() {
 
         }
         this.applyMenuItemParameters();
-		/*
-		this.setupIndicatorPicToZero = function(){
-			$(".indicator-pic").each(function(){
-				$(this).attr("data-state", "0");
-			});
-			return true;
-		};
-		*/
+
 		this.showGroupElements = function(){
 			if(this.trigger_state === 0){
 				$(".indicator-pic.system-"+this.class_group).each(function(){
-					$(this).attr("data-state", "1");
+					$(this).attr("data-visibility", "1");
 					console.log($(this));
 				});
 			}else{
-				$(".indicator-pic.system-"+this.class_element).attr("data-state", "1");
+				$(".indicator-pic.system-"+this.class_element).attr("data-visibility", "1");
 			}
 		};
 		this.showGroupElements();
-		
+
 		console.log();
 		console.log("this.class_category " + this.class_category);
 		console.log("this.class_group " + this.class_group);
@@ -1198,19 +1187,117 @@ $(function() {
 		console.log("this.counter_error " + this.counter_error);
     }
 
+    function getUrlParams() {
+        var url = window.location.search.match(/\?(.+)/)[1].split('&');
+        var res = {};
+        url.forEach(function(entry){
+            res[entry.split('=')[0]] = entry.split('=')[1];
+        });
+        return res;
+    }
+    var urlParams = getUrlParams();
+    console.log(getUrlParams());
+
+    class Item2 {
+        constructor(class_category, class_group, class_element, trigger_id_high, trigger_id_middle, data) {
+            this.class_category = class_category;
+            this.class_group = class_group;
+            this.class_element = class_element;
+            this.trigger_id_high = trigger_id_high;
+            this.trigger_id_middle = trigger_id_middle;
+            this.getTriggerState(data);
+            this.getColorFromState();
+            this.applyIconParameters();
+            this.getErrorCounter();
+            this.applyMenuItemParameters();
+            this.showGroupElements();
+            /* console.log("this.class_category " + this.class_category);
+             console.log("this.class_group " + this.class_group);
+             console.log("this.class_element " + this.class_element);
+             console.log("this.trigger_id_high " + this.trigger_id_high);
+             console.log("this.trigger_id_middle " + this.trigger_id_middle);
+             console.log("this.trigger_state " + this.trigger_state);
+             console.log("this.indicator_color " + this.indicator_color);
+             console.log("this.counter_error " + this.counter_error);*/
+        }
+        getTriggerState(data){
+            if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
+                this.trigger_state = 2;
+            } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
+                this.trigger_state = 1;
+            } else {
+                this.trigger_state = 0;
+            }
+        };
+        getColorFromState(){
+            if (this.trigger_state == 2) {
+                this.indicator_color = '#bb6767';
+            } else if (this.trigger_state == 1) {
+                this.indicator_color = '#ffda73';
+            } else {
+                this.indicator_color = '#00a070';
+            }
+        };
+        applyIconParameters() {
+            $(".indicator-pic.system-"+this.class_element).attr("data-trigger-active", this.trigger_state);
+            //$(".indicator-pic.system-"+this.class_element+" .col-right-item-pic-icon").attr("data-state", this.trigger_state);
+            $(".indicator-pic.system-"+this.class_element+" .col-right-item-pic-icon").css('background', this.indicator_color);
+        };
+        getErrorCounter(){
+            if(this.trigger_state !== 0){
+                this.counter_error = 1;
+            }else{
+                this.counter_error = '';
+            }
+        };
+        applyMenuItemParameters(){
+            var indicator_color = this.indicator_color;
+            $(".menu-top-level-item.category-"+this.class_category+" .menu-top-level-item-indicator-half").each(function(){
+                $(this).removeClass('red');
+                $(this).removeClass('green');
+                $(this).removeClass('yellow');
+                $(this).css('background', indicator_color);
+            });
+            $(".category-"+this.class_category+" .menu-top-level-item-indicator-num  p").text(this.counter_error);
+        };
+        showGroupElements(){
+            if(this.trigger_state === 0){
+                $(".indicator-pic.system-"+this.class_group).each(function(){
+                    $(this).attr("data-visibility", "1");
+                    console.log($(this));
+                });
+            }else{
+                $(".indicator-pic.system-"+this.class_element).attr("data-visibility", "1");
+            }
+        };
+
+    }
+
+    var arrItemsGlobal = [];
     function fetchData() {
         $.ajax({
             url: 'dozor_ajax/getdata.php',
             success: function (data) {
                 var obj = jQuery.parseJSON(data);				
 				setupIndicatorStatePicToZero();
-				obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
+
+				//obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
                 //obj['trigger'][13589] = {'triggerid': 1, 1: 2}; // верхний бак пустой
-                var Water = new Item('engineering-complex', 'water', 'water-0', '13591', '13589', obj);
-				//obj['trigger'][13563] = {'triggerid' : 1, 1: 2}; // t > 80
+
+                //var Water = new Item('engineering-complex', 'water', 'water-0', '13591', '13589', obj);
+
+                //obj['trigger'][13563] = {'triggerid' : 1, 1: 2}; // t > 80
                 //obj['trigger'][13561] = {'triggerid': 1, 1: 2}; // t > 50               
-				var Temperature = new Item('tha1500','temperature', 'temperature-0', '13563', '13561', obj);
-				changeIndicatorVisible();		
+
+                //var Temperature = new Item('tha1500','temperature', 'temperature-0', '13563', '13561', obj);
+
+                arrItemsGlobal['water'] = new Item2('engineering-complex', 'water', 'water-0', '13591', '13589', obj);
+                if(urlParams['sys'] == 'water'){
+                    arrItemsGlobal['water'].showGroupElements();
+                }
+                arrItemsGlobal['temperature'] = new Item2('tha1500','temperature', 'temperature-0', '13563', '13561', obj);
+
+				changeIndicatorVisible();
             }
         });
     };
@@ -1422,7 +1509,7 @@ echo '</pre>000';*/
                         <div class="map-container-map-inner-img">
                             <img  src='/dozor_images/map_route.png'/>
 
-                            <div class="indicator-pic system-water system-water-0" data-state="0">
+                            <div class="indicator-pic system-water system-water-0" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon work">
                                         <div>
@@ -1432,7 +1519,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-energy" data-state="0">
+                            <div class="indicator-pic system-energy" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1442,7 +1529,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-fire-fighting" data-state="0">
+                            <div class="indicator-pic system-fire-fighting" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1452,7 +1539,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-conditioning" data-state="0">
+                            <div class="indicator-pic system-conditioning" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1462,7 +1549,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-supervision1" data-state="0">
+                            <div class="indicator-pic system-supervision1" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1471,7 +1558,7 @@ echo '</pre>000';*/
                                     </div>
                                 </div>
                             </div>
-                            <div class="indicator-pic system-supervision2" data-state="0">
+                            <div class="indicator-pic system-supervision2" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1480,7 +1567,7 @@ echo '</pre>000';*/
                                     </div>
                                 </div>
                             </div>
-                            <div class="indicator-pic system-supervision3" data-state="0">
+                            <div class="indicator-pic system-supervision3" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1490,7 +1577,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-water system-water-1" data-state="0">
+                            <div class="indicator-pic system-water system-water-1" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1500,7 +1587,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-fire-alarm" data-state="0">
+                            <div class="indicator-pic system-fire-alarm" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
@@ -1510,7 +1597,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-remote-access-control" data-state="0">
+                            <div class="indicator-pic system-remote-access-control" data-visibility="0" data-trigger-active="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
