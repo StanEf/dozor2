@@ -1617,7 +1617,7 @@ echo '</pre>000';*/
                                     </div>
                                     <div class="item-scheme-and-video">
                                         <div class="item-scheme">
-                                            Журнал неисправностей
+                                            Журнал<br/>неисправностей
                                         </div>
                                         <div class="item-video">
                                             Показать видео
