@@ -982,10 +982,23 @@ $(function() {
             $(this).removeClass("map-info-status-block-item-selected");
             $(this).find(".map-info-status-block-item-inner .unselected").show();
             $(this).find(".map-info-status-block-item-inner .selected").hide();
+            var trigger_water_active = 0;
             $(".indicator-pic").each(function(){
-                if($(this).attr("data-state") == 0){
+                if($(this).hasClass("system-water")){
+                    if($(this).attr("data-state") == 2){
+                        trigger_water_active = 1;
+                    }
+                }
+            });
+            $(".indicator-pic").each(function(){
+                if(!$(this).hasClass("system-water")){
                     $(this).hide();
-                    //$(this).attr("data-state", 1);
+                    $(this).attr("data-state", 0);
+                }else{
+                    if(trigger_water_active == 0){
+                        $(this).hide();
+                        $(this).attr("data-state", 0);
+                    }
                 }
             });
         }
@@ -1191,7 +1204,7 @@ $(function() {
             success: function (data) {
                 var obj = jQuery.parseJSON(data);				
 				setupIndicatorStatePicToZero();
-				//obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
+				obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
                 //obj['trigger'][13589] = {'triggerid': 1, 1: 2}; // верхний бак пустой
                 var Water = new Item('engineering-complex', 'water', 'water-0', '13591', '13589', obj);
 				//obj['trigger'][13563] = {'triggerid' : 1, 1: 2}; // t > 80

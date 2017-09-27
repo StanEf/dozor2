@@ -761,9 +761,9 @@ $(function() {
         $(".col-right-item-pic-icon.work").on("mouseenter", function(){
             console.log("click");
             if($(this).hasClass("water")){
-            $(".window-pop-up .item-scheme").html("<a href='/dozorfloor0.php'> Показать схему </a>");
+            $(".window-pop-up .item-scheme").html("<a href='/dozorfloor0.php?system=water'> Показать схему </a>");
             }else{
-            $(".window-pop-up .item-scheme").html("<a href='/dozorengine.php'> Показать схему </a>");
+            $(".window-pop-up .item-scheme").html("<a href='/dozorengine.php?system=temperature'> Показать схему </a>");
             }
            //var dfdf =  $(".items-block").getBoundingClientRect();
 
