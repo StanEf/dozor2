@@ -869,7 +869,7 @@ $(function() {
     setInterval(function() {
         console.log('fetch data');
         fetchData();
-    }, 6000);
+    }, 1500);
 
     var colorIndicatorArr = {
         'indicator_color_red' : '#bb676',
