@@ -1050,7 +1050,7 @@ $(function() {
 setInterval(function() {
 	console.log('fetch data');
 	fetchData();
-}, 6000);
+}, 2000);
 
 function fetchData() {
 	$.ajax({

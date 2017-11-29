@@ -882,6 +882,7 @@ $(function() {
         this.trigger_id_high = trigger_id_high;
         this.trigger_id_middle = trigger_id_middle;
         this.getTriggerState = function(data){
+            console.log(data);
             if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
                 this.trigger_state = 2;
             } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
