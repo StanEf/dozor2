@@ -164,7 +164,7 @@ $DB->Query($sql);*/
         return arrTemperatures;
     }
 
-    function addTemperatureToDb(i, arrTemperatures){
+    function modifyTemperatureInDb(i, arrTemperatures){
         console.log('from func ' + i + '   ' + arrTemperatures[i]);
         $.ajax({
             url: 'dozor_ajax/setdata.php',
@@ -193,11 +193,42 @@ $DB->Query($sql);*/
 
                     }
                 });*/
-                addTemperatureToDb(i, arrTemperatures);
+                modifyTemperatureInDb(i, arrTemperatures);
+
                 setTimeout(run, delay);
             }
-           
+
         }, delay);
+    }
+
+    function modifyTemperatureTriggersInDb(trigger_red, trigger_yellow){
+        $.ajax({
+         url: 'dozor_ajax/setdata.php',
+         method: "POST",
+         data: {
+            action: "temperature-triggers-modify",
+            trigger_red: trigger_red,
+            trigger_yellow: trigger_yellow
+         },
+         success: function (data) {
+
+         }
+         });
+    }
+
+    function setTriggersState(current_temperature){
+        var trigger_red, trigger_yellow;
+        if(current_temperature >= 85){
+            trigger_red = 'Y';
+            trigger_yellow = 'Y';
+        }else if(current_temperature >= 55){
+            trigger_red = 'N';
+            trigger_yellow = 'Y';
+        }else{
+            trigger_red = 'N';
+            trigger_yellow = 'N';
+        }
+        modifyTemperatureTriggersInDb(trigger_red, trigger_yellow);
     }
 
     function getTemperatureCurrent(){
