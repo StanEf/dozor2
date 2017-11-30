@@ -120,177 +120,218 @@ $DB->Query($sql);*/
 
 <!-- После подключения jQuery, Popper и Bootstrap JS -->
 <script>
-    $(function () {
-        $('[data-toggle="popover"]').popover({trigger:'hover'});
-        $('.temperature-sensor-red').on('click', function(){
-            changeTemperatureSensorToRed();
-        });
-        $('.temperature-sensor-yellow').on('click', function(){
-            changeTemperatureSensorToYellow();
-        });
-        $('.temperature-sensor-green').on('click', function(){
-            changeTemperatureSensorToGreen();
-        });
+$(function () {
+    $('[data-toggle="popover"]').popover({trigger:'hover'});
+    $('.temperature-sensor-red').on('click', function(){
+        changeTemperatureSensorToRed();
     });
+    $('.temperature-sensor-yellow').on('click', function(){
+        changeTemperatureSensorToYellow();
+    });
+    $('.temperature-sensor-green').on('click', function(){
+        changeTemperatureSensorToGreen();
+    });
+});
 
-    function getArrIterativeChangeTemperature(initial, final){
-        var stepTemperature = 2;
-        var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
-        console.log('initial '+ initial +' final '+ final +' delta ' + delta);
-        var current = initial;
-        var arrTemperatures = [];
-        for(var i=0; i<delta; i++){
-            if(initial < final) {
-                current += 1.8 + Math.random() * 0.2;
-                if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
-                    arrTemperatures[i] = current;
-                    //console.log('current ' + current);
-                }
-            }else{
-                current -= 1.8 + Math.random() * 0.2;
+function getArrIterativeChangeTemperature(initial, final){
+    var stepTemperature = 2;
+    var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
+    console.log('initial '+ initial +' final '+ final +' delta ' + delta);
+    var current = initial;
+    var arrTemperatures = [];
+    for(var i=0; i<delta; i++){
+        if(initial < final) {
+            current += 1.8 + Math.random() * 0.2;
+            if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
+                arrTemperatures[i] = current;
                 //console.log('current ' + current);
-                if(current > final){
-                    arrTemperatures[i] = current;
-                    //console.log('current ' + current);
-                }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
-                    if(arrTemperatures[i-1] != final) {
-                        arrTemperatures[i] = final;
+            }
+        }else{
+            current -= 1.8 + Math.random() * 0.2;
+            //console.log('current ' + current);
+            if(current > final){
+                arrTemperatures[i] = current;
+                //console.log('current ' + current);
+            }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
+                if(arrTemperatures[i-1] != final) {
+                    arrTemperatures[i] = final;
+                }
+            }
+        }
+    }
+    console.log(arrTemperatures);
+    return arrTemperatures;
+}
+
+function modifyTemperatureInDb(i, arrTemperatures){
+    console.log('from func ' + i + '   ' + arrTemperatures[i]);
+    $.ajax({
+        url: 'dozor_ajax/setdata.php',
+        method: "POST",
+        data: {
+            action: "temperature-incremental",
+            value: arrTemperatures[i]
+        },
+        success: function (data) {}
+    });
+}
+
+function startCyclicTimer(delay, arrTemperatures){
+    var i = 0;
+    setTimeout(function run() {
+        i++;
+        if(typeof arrTemperatures[i] !== "undefined"){
+            modifyTemperatureInDb(i, arrTemperatures);
+            setTimeout(run, delay);
+        }
+
+    }, delay);
+}
+
+function modifyTemperatureTriggersInDb(trigger_red, trigger_yellow){
+    $.ajax({
+     url: 'dozor_ajax/setdata.php',
+     method: "POST",
+     data: {
+        action: "temperature-triggers-modify",
+        trigger_red: trigger_red,
+        trigger_yellow: trigger_yellow
+     },
+     success: function (data) {
+
+     }
+     });
+}
+
+function setTriggersState(current_temperature){
+    var trigger_red, trigger_yellow;
+    if(current_temperature >= 85){
+        trigger_red = 'Y';
+        trigger_yellow = 'Y';
+    }else if(current_temperature >= 55){
+        trigger_red = 'N';
+        trigger_yellow = 'Y';
+    }else{
+        trigger_red = 'N';
+        trigger_yellow = 'N';
+    }
+    modifyTemperatureTriggersInDb(trigger_red, trigger_yellow);
+}
+
+function getTemperatureCurrent(){
+    $.ajax({
+     url: 'dozor_ajax/getdata.php',
+     method: "POST",
+     data: {
+        action: "temperature-get-current"
+     },
+     success: function (data) {
+        console.log(data);
+        return data;
+     }
+     });
+}
+
+function changeTemperatureSensorToRed() {
+    var params;
+    params = {
+        'temperature_start' : 20.1,
+        'temperature_final' : 85,
+        'temperature_step'  : 2,
+        'delay_before_update' : 500,
+    };
+    var TemperatureRed = new Event('temperature', params);
+    TemperatureRed.getArrIterativeChangeTemperature();
+    TemperatureRed.startCyclicTimer();
+}
+
+function changeTemperatureSensorToYellow() {
+    var params;
+    params = {
+        'temperature_start' : 20.1,
+        'temperature_final' : 55,
+        'temperature_step'  : 2,
+        'delay_before_update' : 500,
+    };
+    var TemperatureYellow = new Event('temperature', params);
+    TemperatureYellow.getArrIterativeChangeTemperature();
+    TemperatureYellow.startCyclicTimer();
+}
+
+function changeTemperatureSensorToGreen() {
+    $.ajax({
+        url: 'dozor_ajax/getdata.php',
+        method: "POST",
+        data: {
+            action: "temperature-get-current"
+        },
+        success: function (data) {
+            var params;
+            params = {
+                'temperature_start' : parseFloat(data),
+                'temperature_final' : 20.1,
+                'temperature_step'  : 2,
+                'delay_before_update' : 500,
+            };
+            var TemperatureGreen = new Event('temperature', params);
+            TemperatureGreen.getArrIterativeChangeTemperature();
+            TemperatureGreen.startCyclicTimer();
+        }
+    });
+}
+
+function Event(type, params){
+    this.type = type;
+    this.params = params;
+    if(this.type == 'temperature'){
+        this.getArrIterativeChangeTemperature = function(){
+            var initial = this.params['temperature_start'];
+            var final = this.params['temperature_final'];
+            var stepTemperature = this.params['temperature_step'];
+            var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
+            console.log('initial '+ initial +' final '+ final +' delta ' + delta);
+            var current = initial;
+            var arrTemperatures = [];
+            for(var i=0; i<delta; i++){
+                if(initial < final) {
+                    current += 1.8 + Math.random() * 0.2;
+                    if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
+                        arrTemperatures[i] = current;
+                    }
+                }else{
+                    current -= 1.8 + Math.random() * 0.2;
+                    if(current > final){
+                        arrTemperatures[i] = current;
+                    }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
+                        if(arrTemperatures[i-1] != final) {
+                            arrTemperatures[i] = final;
+                        }
                     }
                 }
             }
-
+            this.arrTemperatures = arrTemperatures;
+            console.log(this.arrTemperatures);
         }
-        console.log(arrTemperatures);
-        return arrTemperatures;
-    }
 
-    function modifyTemperatureInDb(i, arrTemperatures){
-        console.log('from func ' + i + '   ' + arrTemperatures[i]);
-        $.ajax({
-            url: 'dozor_ajax/setdata.php',
-            method: "POST",
-            data: {
-                action: "temperature-incremental",
-                value: arrTemperatures[i]
-            },
-            success: function (data) {}
-        });
-    }
-
-    function startCyclicTimer(delay, arrTemperatures){
-        var i = 0;
-        setTimeout(function run() {
-            i++;
-            if(typeof arrTemperatures[i] !== "undefined"){
-                /*$.ajax({
-                    url: 'dozor_ajax/setdata.php',
-                    method: "POST",
-                    data: {
-                        action: "temperature-incremental",
-                        value: temperature_current
-                    },
-                    success: function (data) {
-
-                    }
-                });*/
-                modifyTemperatureInDb(i, arrTemperatures);
-
-                setTimeout(run, delay);
-            }
-
-        }, delay);
-    }
-
-    function modifyTemperatureTriggersInDb(trigger_red, trigger_yellow){
-        $.ajax({
-         url: 'dozor_ajax/setdata.php',
-         method: "POST",
-         data: {
-            action: "temperature-triggers-modify",
-            trigger_red: trigger_red,
-            trigger_yellow: trigger_yellow
-         },
-         success: function (data) {
-
-         }
-         });
-    }
-
-    function setTriggersState(current_temperature){
-        var trigger_red, trigger_yellow;
-        if(current_temperature >= 85){
-            trigger_red = 'Y';
-            trigger_yellow = 'Y';
-        }else if(current_temperature >= 55){
-            trigger_red = 'N';
-            trigger_yellow = 'Y';
-        }else{
-            trigger_red = 'N';
-            trigger_yellow = 'N';
+        this.startCyclicTimer = function(){
+            var i = 0;
+            var arrTemperaturesTmp = this.arrTemperatures;
+            var delay = this.params['delay_before_update']
+            setTimeout(function run() {
+                i++;
+                if(typeof arrTemperaturesTmp[i] !== "undefined"){
+                    modifyTemperatureInDb(i, arrTemperaturesTmp);
+                    setTimeout(run, delay);
+                }
+            }, delay);
         }
-        modifyTemperatureTriggersInDb(trigger_red, trigger_yellow);
     }
-
-    function getTemperatureCurrent(){
-        $.ajax({
-         url: 'dozor_ajax/getdata.php',
-         method: "POST",
-         data: {
-            action: "temperature-get-current"
-         },
-         success: function (data) {
-            console.log(data);
-            return data;
-         }
-         });
-    }
-
-    function changeTemperatureSensorToRed() {
-        var temperature_start = 20.1;
-        var temperature_final = 85;
-        var arrTemperatures = getArrIterativeChangeTemperature(temperature_start, temperature_final);
-        startCyclicTimer(2000, arrTemperatures);
-    }
-
-    function changeTemperatureSensorToYellow() {
-        var temperature_start = 20.1;
-        var temperature_final = 55;
-        var arrTemperatures = getArrIterativeChangeTemperature(temperature_start, temperature_final);
-        startCyclicTimer(2000, arrTemperatures);
-    }
-
-    function changeTemperatureSensorToGreen() {
-        $.ajax({
-            url: 'dozor_ajax/getdata.php',
-            method: "POST",
-            data: {
-                action: "temperature-get-current"
-            },
-            success: function (data) {
-                console.log(data);
-                var temperature_current = parseFloat(data);
-                var temperature_normal = 20.1;
-                console.log('temperature_current ' + temperature_current + ' temperature_normal ' + temperature_normal);
-                var arrTemperatures = getArrIterativeChangeTemperature(temperature_current, temperature_normal);
-                startCyclicTimer(2000, arrTemperatures);
-            }
-        });
+}
 
 
 
 
-        /*$.ajax({
-            url: 'dozor_ajax/setdata.php',
-            method: "POST",
-            data: {
-                action: "temperature-sensor-green",
-                location: "Boston"
-            },
-            success: function (data) {
 
-            }
-        });*/
-    }
 </script>
 
 </body>
