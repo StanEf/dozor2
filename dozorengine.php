@@ -928,6 +928,7 @@ function Item(class_category, class_group, class_element, trigger_id_high, trigg
 	this.changeStateIndicatorTemperature = function(data){
 		if(this.class_element == "temperature-0"){
 			var lastvalue = data['items'][23675]['lastvalue'];
+			$(".indicator-pic.indicator_temperature").attr("data-temperature", lastvalue);
 			lastvalueArr = lastvalue.split('.');
 			$('.indicator-temperature-number-big').text(lastvalueArr[0]);
 			lastvalueArr2 = lastvalueArr[1].split('');
@@ -1333,7 +1334,7 @@ $(".col-left-logo-inner").on("click", function(){
                                     </div>
                                 </div>
                             </div>
-                            <div class="indicator-pic indicator_temperature">
+                            <div class="indicator-pic indicator_temperature" data-temperature="">
                                 <div class="col-right-item-pic-indicator-temperature">
                                     <div class="col-right-item-pic-icon-indicator-temperature">
                                         <div class="in1">
