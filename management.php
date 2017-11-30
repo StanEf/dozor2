@@ -131,30 +131,58 @@ $DB->Query($sql);*/
         $('.temperature-sensor-green').on('click', function(){
             changeTemperatureSensorToGreen();
         });
-
-
     });
-    function changeTemperatureSensorToRed() {
-        var temperature_start = 20.1;
-        var temperature_final = 85;
-        var temperature_delta = Math.ceil((temperature_final - temperature_start)/2)+3;
-        var temperature_current = temperature_start;
+
+    function getArrIterativeChangeTemperature(initial, final){
+        var stepTemperature = 2;
+        var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
+        console.log('initial '+ initial +' final '+ final +' delta ' + delta);
+        var current = initial;
         var arrTemperatures = [];
-        for(var i=0; i<temperature_delta; i++){
-            temperature_current += 1.8 + Math.random() * 0.2;
-            arrTemperatures[i] = temperature_current;
-
-
-            console.log('temperature_current ' + temperature_current);
+        for(var i=0; i<delta; i++){
+            if(initial < final) {
+                current += 1.8 + Math.random() * 0.2;
+                if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
+                    arrTemperatures[i] = current;
+                    //console.log('current ' + current);
+                }
+            }else{
+                current -= 1.8 + Math.random() * 0.2;
+                //console.log('current ' + current);
+                if(current > final){
+                    arrTemperatures[i] = current;
+                    //console.log('current ' + current);
+                }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
+                    if(arrTemperatures[i-1] != final) {
+                        arrTemperatures[i] = final;
+                    }
+                }
+            }
 
         }
+        console.log(arrTemperatures);
+        return arrTemperatures;
+    }
 
+    function addTemperatureToDb(i, arrTemperatures){
+        console.log('from func ' + i + '   ' + arrTemperatures[i]);
+        $.ajax({
+            url: 'dozor_ajax/setdata.php',
+            method: "POST",
+            data: {
+                action: "temperature-incremental",
+                value: arrTemperatures[i]
+            },
+            success: function (data) {}
+        });
+    }
 
+    function startCyclicTimer(delay, arrTemperatures){
         var i = 0;
         setTimeout(function run() {
             i++;
-            if(i > temperature_delta){
-                $.ajax({
+            if(typeof arrTemperatures[i] !== "undefined"){
+                /*$.ajax({
                     url: 'dozor_ajax/setdata.php',
                     method: "POST",
                     data: {
@@ -164,45 +192,63 @@ $DB->Query($sql);*/
                     success: function (data) {
 
                     }
-                });
-                return;
-
+                });*/
+                addTemperatureToDb(i, arrTemperatures);
+                setTimeout(run, delay);
             }
-            addTemperatureToDb(i);
-            setTimeout(run, 2000);
-        }, 2000);
-        function addTemperatureToDb(i){
-            console.log('from func ' + i + '   ' + arrTemperatures[i]);
-            $.ajax({
-                url: 'dozor_ajax/setdata.php',
-                method: "POST",
-                data: {
-                    action: "temperature-incremental",
-                    value: arrTemperatures[i]
-                },
-                success: function (data) {
-
-                }
-            });
-        }
-
-
+           
+        }, delay);
     }
-    function changeTemperatureSensorToYellow() {
+
+    function getTemperatureCurrent(){
         $.ajax({
-            url: 'dozor_ajax/setdata.php',
+         url: 'dozor_ajax/getdata.php',
+         method: "POST",
+         data: {
+            action: "temperature-get-current"
+         },
+         success: function (data) {
+            console.log(data);
+            return data;
+         }
+         });
+    }
+
+    function changeTemperatureSensorToRed() {
+        var temperature_start = 20.1;
+        var temperature_final = 85;
+        var arrTemperatures = getArrIterativeChangeTemperature(temperature_start, temperature_final);
+        startCyclicTimer(2000, arrTemperatures);
+    }
+
+    function changeTemperatureSensorToYellow() {
+        var temperature_start = 20.1;
+        var temperature_final = 55;
+        var arrTemperatures = getArrIterativeChangeTemperature(temperature_start, temperature_final);
+        startCyclicTimer(2000, arrTemperatures);
+    }
+
+    function changeTemperatureSensorToGreen() {
+        $.ajax({
+            url: 'dozor_ajax/getdata.php',
             method: "POST",
             data: {
-                action: "temperature-sensor-yellow",
-                location: "Boston"
+                action: "temperature-get-current"
             },
             success: function (data) {
                 console.log(data);
+                var temperature_current = parseFloat(data);
+                var temperature_normal = 20.1;
+                console.log('temperature_current ' + temperature_current + ' temperature_normal ' + temperature_normal);
+                var arrTemperatures = getArrIterativeChangeTemperature(temperature_current, temperature_normal);
+                startCyclicTimer(2000, arrTemperatures);
             }
         });
-    }
-    function changeTemperatureSensorToGreen() {
-        $.ajax({
+
+
+
+
+        /*$.ajax({
             url: 'dozor_ajax/setdata.php',
             method: "POST",
             data: {
@@ -212,7 +258,7 @@ $DB->Query($sql);*/
             success: function (data) {
 
             }
-        });
+        });*/
     }
 </script>
 

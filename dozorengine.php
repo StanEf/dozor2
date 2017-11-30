@@ -870,13 +870,18 @@ function Item(class_category, class_group, class_element, trigger_id_high, trigg
 	this.trigger_id_high = trigger_id_high;
 	this.trigger_id_middle = trigger_id_middle;
 	this.getTriggerState = function(data){
-		if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
-			this.trigger_state = 2;
-		} else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
-			this.trigger_state = 1;
-		} else {
-			this.trigger_state = 0;
-		}
+	    if(!$.isEmptyObject(data['trigger'])){
+            if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
+                this.trigger_state = 2;
+            } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
+                this.trigger_state = 1;
+            } else {
+                this.trigger_state = 0;
+            }
+        }else{
+            this.trigger_state = 0;
+        }
+
 	};
 	this.getTriggerState(data);
 	this.getColorFromState = function(){
@@ -1058,7 +1063,7 @@ function fetchData() {
 		url: 'dozor_ajax/getdata.php',
 		success: function (data) {
 			var obj = jQuery.parseJSON(data);
-			
+			console.log(obj);
 			//obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
 			//obj['trigger'][13589] = {'triggerid': 1, 1: 2}; // верхний бак пустой
 			var Water = new Item('engineering-complex', 'water', 'water-0', '13591', '13589', obj);
@@ -1334,7 +1339,7 @@ $(".col-left-logo-inner").on("click", function(){
                                     </div>
                                 </div>
                             </div>
-                            <div class="indicator-pic indicator_temperature" data-temperature="">
+                            <div class="indicator-pic indicator_temperature" data-temperature="" data-temperature-normal="20">
                                 <div class="col-right-item-pic-indicator-temperature">
                                     <div class="col-right-item-pic-icon-indicator-temperature">
                                         <div class="in1">

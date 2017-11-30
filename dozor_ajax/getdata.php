@@ -20,37 +20,53 @@ echo '</pre>000';*/
 //$arr["trigger"][13561] = array('trigger_id' => 1, '3' => 3);
 /*
 */
-$arResult = array();
-
-/*$arResult["items"]["23675"]["itemid"] = "23675";
-$arResult["items"]["23675"]["lastvalue"] = "85.7194";*/
-
-$sql = "SELECT * FROM bitrix_60.dozor_items WHERE ID = 23675";
-$res = $DB->Query($sql);
-while($ar_fields = $res->GetNext())
-{
-    /*echo '<br/> dozor_items '. __LINE__.'* ' .  __FILE__ . ' <pre>';
-    print_r($ar_fields);
-    echo '</pre>';*/
-    $arResult["items"]["23675"]["itemid"] = "23675";
-    $arResult["items"]["23675"]["lastvalue"] = $ar_fields["VALUE"];
-}
-
-
-$sql = "SELECT * FROM bitrix_60.dozor_triggers";
-$res = $DB->Query($sql);
-while($ar_fields = $res->GetNext())
-{
-    /*echo '<br/> $ar_fields '. __LINE__.'* ' .  __FILE__ . ' <pre>';
-    print_r($ar_fields);
-    echo '</pre>';*/
-    if($ar_fields["STATE_ACTIVE"] == 'Y'){
-        $arResult["trigger"][$ar_fields["ID"]] = array('trigger_id' => 1, '3' => 3);
+if(isset($_POST["action"]) && $_POST["action"] == "temperature-get-current"){
+    $sql = "SELECT * FROM bitrix_60.dozor_items WHERE ID = 23675";
+    $res = $DB->Query($sql);
+    while ($ar_fields = $res->GetNext()) {
+        /*echo '<br/> dozor_items '. __LINE__.'* ' .  __FILE__ . ' <pre>';
+        print_r($ar_fields);
+        echo '</pre>';*/
+        /*$arResult["items"]["23675"]["itemid"] = "23675";
+        $arResult["items"]["23675"]["lastvalue"] = $ar_fields["VALUE"];*/
+        $current_temperature = $ar_fields["VALUE"];
     }
+    echo $current_temperature;
+    /*$str = json_encode($current_temperature);
+    echo $str;*/
+
+}else {
+
+
+    $arResult = array();
+
+    /*$arResult["items"]["23675"]["itemid"] = "23675";
+    $arResult["items"]["23675"]["lastvalue"] = "85.7194";*/
+
+    $sql = "SELECT * FROM bitrix_60.dozor_items WHERE ID = 23675";
+    $res = $DB->Query($sql);
+    while ($ar_fields = $res->GetNext()) {
+        /*echo '<br/> dozor_items '. __LINE__.'* ' .  __FILE__ . ' <pre>';
+        print_r($ar_fields);
+        echo '</pre>';*/
+        $arResult["items"]["23675"]["itemid"] = "23675";
+        $arResult["items"]["23675"]["lastvalue"] = $ar_fields["VALUE"];
+    }
+
+
+    $sql = "SELECT * FROM bitrix_60.dozor_triggers";
+    $res = $DB->Query($sql);
+    while ($ar_fields = $res->GetNext()) {
+        /*echo '<br/> $ar_fields '. __LINE__.'* ' .  __FILE__ . ' <pre>';
+        print_r($ar_fields);
+        echo '</pre>';*/
+        if ($ar_fields["STATE_ACTIVE"] == 'Y') {
+            $arResult["trigger"][$ar_fields["ID"]] = array('trigger_id' => 1, '3' => 3);
+        }
+    }
+
+
+    $str = json_encode($arResult);
+    echo $str;
+
 }
-
-
-
-
-$str = json_encode($arResult);
-echo $str;
