@@ -123,17 +123,26 @@ $DB->Query($sql);*/
 $(function () {
     $('[data-toggle="popover"]').popover({trigger:'hover'});
     $('.temperature-sensor-red').on('click', function(){
+        console.log('');
+        console.log('');
+        console.log('CLICK RED');
         changeTemperatureSensorToRed();
     });
     $('.temperature-sensor-yellow').on('click', function(){
+        console.log('');
+        console.log('');
+        console.log('CLICK YELLOW');
         changeTemperatureSensorToYellow();
     });
     $('.temperature-sensor-green').on('click', function(){
+        console.log('');
+        console.log('');
+        console.log('CLICK GREEN');
         changeTemperatureSensorToGreen();
     });
 });
 
-function getArrIterativeChangeTemperature(initial, final){
+/*function getArrIterativeChangeTemperature(initial, final){
     var stepTemperature = 2;
     var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
     console.log('initial '+ initial +' final '+ final +' delta ' + delta);
@@ -161,31 +170,26 @@ function getArrIterativeChangeTemperature(initial, final){
     }
     console.log(arrTemperatures);
     return arrTemperatures;
-}
+}*/
 
-function modifyTemperatureInDb(i, arrTemperatures){
-    console.log('from func ' + i + '   ' + arrTemperatures[i]);
+function modifyTemperatureAndTriggersInDb(params_temperature){
+    console.log('modifyTemperatureAndTriggersInDb in ');
+    console.log(params_temperature);
+    var i = params_temperature['index'];
+    var arrTemperatures = params_temperature['arr_temperature'];
     $.ajax({
         url: 'dozor_ajax/setdata.php',
         method: "POST",
         data: {
-            action: "temperature-incremental",
-            value: arrTemperatures[i]
+            action: "temperature-change",
+            value: params_temperature
         },
         success: function (data) {}
     });
-}
 
-function startCyclicTimer(delay, arrTemperatures){
-    var i = 0;
-    setTimeout(function run() {
-        i++;
-        if(typeof arrTemperatures[i] !== "undefined"){
-            modifyTemperatureInDb(i, arrTemperatures);
-            setTimeout(run, delay);
-        }
-
-    }, delay);
+    var current_state_trigger_red = params_temperature['trigger_red_state'];
+    var current_state_trigger_yellow = params_temperature['trigger_yellow_state'];
+    setTriggersState(params_temperature);
 }
 
 function modifyTemperatureTriggersInDb(trigger_red, trigger_yellow){
@@ -203,19 +207,31 @@ function modifyTemperatureTriggersInDb(trigger_red, trigger_yellow){
      });
 }
 
-function setTriggersState(current_temperature){
+function setTriggersState(current_temperature, current_state_trigger_red, current_state_trigger_yellow){
     var trigger_red, trigger_yellow;
-    if(current_temperature >= 85){
+    var modify = 0;
+    if(current_temperature >= 85 && (current_state_trigger_yellow != 'Y' || current_state_trigger_red != 'Y')){
         trigger_red = 'Y';
         trigger_yellow = 'Y';
-    }else if(current_temperature >= 55){
+        modify = 1;
+    }else if(current_temperature >= 55 && current_state_trigger_yellow != 'Y'){
         trigger_red = 'N';
         trigger_yellow = 'Y';
-    }else{
+        modify = 1;
+    }else if(current_state_trigger_yellow != 'N' || current_state_trigger_red != 'N'){
         trigger_red = 'N';
         trigger_yellow = 'N';
+        modify = 1;
+    }else{}
+
+    //conso
+    if(modify == 1) {
+        console.log('setTriggersState current_temperature' +current_temperature );
+        console.log('setTriggersState current_state_trigger_red ' +current_state_trigger_red );
+        console.log('setTriggersState current_state_trigger_yellow ' +current_state_trigger_yellow );
+
+        modifyTemperatureTriggersInDb(trigger_red, trigger_yellow);
     }
-    modifyTemperatureTriggersInDb(trigger_red, trigger_yellow);
 }
 
 function getTemperatureCurrent(){
@@ -231,6 +247,78 @@ function getTemperatureCurrent(){
      }
      });
 }
+function next(i, data){
+    console.log('in NEXT');
+    console.log('i ' + i);
+    console.log(data);
+    i = i + 1;
+    if(i < data['arr_temperatures_length']){
+       // setTimeout('newModifyTemperature', 1000, i, data);
+        setTimeout(function(){
+            newModifyTemperature(i, data);
+        }, 1000);
+    }
+}
+
+function newModifyTemperature(i, data){
+    console.log('newModifyTemperature');
+    console.log(i);
+    console.log(data);
+    var arrTemperatures = data['arr_temperatures'];
+    $.ajax({
+        url: 'dozor_ajax/setdata.php',
+        method: "POST",
+        data: {
+            action: "temperature-change",
+            value: data['arr_temperatures'][i]
+        },
+        success: function (result) {
+            newSetTriggerState(i, data);
+        }
+    });
+
+
+}
+
+function newSetTriggerState(i, data){
+    if(data['arr_temperatures'][i] >= 85 && (data['trigger_yellow_state'] != 'Y' || data['trigger_red_state'] != 'Y')){
+        trigger_red = 'Y';
+        trigger_yellow = 'Y';
+        modify = 1;
+    }else if(data['arr_temperatures'][i] >= 55 && data['trigger_yellow_state'] != 'Y'){
+        trigger_red = 'N';
+        trigger_yellow = 'Y';
+        modify = 1;
+    }else if(data['trigger_yellow_state'] != 'N' || data['trigger_red_state'] != 'N'){
+        trigger_red = 'N';
+        trigger_yellow = 'N';
+        modify = 1;
+    }else{}
+
+    //conso
+    if(modify == 1) {
+        console.log('newSetTriggerState current_temperature' + data['arr_temperatures'][i] );
+        console.log('newSetTriggerState current_state_trigger_red ' + data['trigger_red_state'] );
+        console.log('newSetTriggerState current_state_trigger_yellow ' + data['trigger_yellow_state'] );
+
+        newModifyTriggers(i, data);
+    }
+}
+
+function newModifyTriggers(i, data){
+    $.ajax({
+        url: 'dozor_ajax/setdata.php',
+        method: "POST",
+        data: {
+            action: "temperature-triggers-modify",
+            trigger_red: data['trigger_red_state'],
+            trigger_yellow: data['trigger_yellow_state']
+        },
+        success: function (result) {
+            next(i, data);
+        }
+    });
+}
 
 function changeTemperatureSensorToRed() {
     var params;
@@ -241,8 +329,6 @@ function changeTemperatureSensorToRed() {
         'delay_before_update' : 500,
     };
     var TemperatureRed = new Event('temperature', params);
-    TemperatureRed.getArrIterativeChangeTemperature();
-    TemperatureRed.startCyclicTimer();
 }
 
 function changeTemperatureSensorToYellow() {
@@ -254,8 +340,6 @@ function changeTemperatureSensorToYellow() {
         'delay_before_update' : 500,
     };
     var TemperatureYellow = new Event('temperature', params);
-    TemperatureYellow.getArrIterativeChangeTemperature();
-    TemperatureYellow.startCyclicTimer();
 }
 
 function changeTemperatureSensorToGreen() {
@@ -274,57 +358,106 @@ function changeTemperatureSensorToGreen() {
                 'delay_before_update' : 500,
             };
             var TemperatureGreen = new Event('temperature', params);
-            TemperatureGreen.getArrIterativeChangeTemperature();
-            TemperatureGreen.startCyclicTimer();
         }
     });
 }
+
+function getArrIterativeChangeTemperature(params){
+    console.log('getArrIterativeChangeTemperature');
+    console.log(params);
+    var initial = params['temperature_start'];
+    var final = params['temperature_final'];
+    var stepTemperature = params['temperature_step'];
+    var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
+    console.log('4initial '+ initial +' final '+ final +' delta ' + delta);
+    var current = initial;
+    var arrTemperatures = [];
+    for(var i=0; i<delta; i++){
+        if(initial < final) {
+            current += 1.8 + Math.random() * 0.2;
+            if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
+                arrTemperatures[i] = current;
+            }
+        }else{
+            current -= 1.8 + Math.random() * 0.2;
+            if(current > final){
+                arrTemperatures[i] = current;
+            }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
+                if(arrTemperatures[i-1] != final) {
+                    arrTemperatures[i] = final;
+                }
+            }
+        }
+    }
+    params['arr_temperatures'] = arrTemperatures;
+    console.log('getArrIterativeChangeTemperature finish params');
+    console.log(params);
+    return params;
+}
+
+function start(type, params){
+    $.ajax({
+        url: 'dozor_ajax/getdata.php',
+        method: "POST",
+        async: false,
+        data: {
+            action: "temperature-get-state-triggers"
+        },
+        success: function (request) {
+            console.log('getStateTriggers');
+            /*this.triggers_state = JSON.parse(data);
+             console.log(this.triggers_state);*/
+            request = JSON.parse(request);
+            console.log(request);
+            console.log('');
+            console.log('');
+            console.log(params);
+            params['trigger_red_state'] = request['red'];
+            params['trigger_yellow_state'] = request['yellow'];
+
+
+            params = getArrIterativeChangeTemperature(params);
+            console.log('');
+            console.log('');
+
+            var i = 0;
+            params['arr_temperatures_length'] = params['arr_temperatures'].length;
+            console.log(params);
+            next(i, params);
+        }
+    });
+
+    //alert(request);
+    /*console.log('request');
+     console.log(request);
+     this.triggers_state = JSON.parse(request);
+     this.getArrIterativeChangeTemperature();*/
+}
+
+
 
 function Event(type, params){
     this.type = type;
     this.params = params;
     if(this.type == 'temperature'){
-        this.getArrIterativeChangeTemperature = function(){
-            var initial = this.params['temperature_start'];
-            var final = this.params['temperature_final'];
-            var stepTemperature = this.params['temperature_step'];
-            var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
-            console.log('initial '+ initial +' final '+ final +' delta ' + delta);
-            var current = initial;
-            var arrTemperatures = [];
-            for(var i=0; i<delta; i++){
-                if(initial < final) {
-                    current += 1.8 + Math.random() * 0.2;
-                    if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
-                        arrTemperatures[i] = current;
-                    }
-                }else{
-                    current -= 1.8 + Math.random() * 0.2;
-                    if(current > final){
-                        arrTemperatures[i] = current;
-                    }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
-                        if(arrTemperatures[i-1] != final) {
-                            arrTemperatures[i] = final;
-                        }
-                    }
-                }
-            }
-            this.arrTemperatures = arrTemperatures;
-            console.log(this.arrTemperatures);
+        this.startCyclicTimer2 = function(){
+            var delay = this.params['delay_before_update'];
+
+            var data = [];
+            data['arr_temperature'] = this.arrTemperatures;
+            data['trigger_red_state'] = this.triggers_state['red'];
+            data['trigger_yellow_state'] = this.triggers_state['yellow'];
+
+            var i = 0;
+            data['arr_temperature_length'] = data['arr_temperature'].length;
+
+            next(i, data);
         }
 
-        this.startCyclicTimer = function(){
-            var i = 0;
-            var arrTemperaturesTmp = this.arrTemperatures;
-            var delay = this.params['delay_before_update']
-            setTimeout(function run() {
-                i++;
-                if(typeof arrTemperaturesTmp[i] !== "undefined"){
-                    modifyTemperatureInDb(i, arrTemperaturesTmp);
-                    setTimeout(run, delay);
-                }
-            }, delay);
-        }
+
+        start(type, params);
+
+
     }
 }
 

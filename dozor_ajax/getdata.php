@@ -20,7 +20,7 @@ echo '</pre>000';*/
 //$arr["trigger"][13561] = array('trigger_id' => 1, '3' => 3);
 /*
 */
-if(isset($_POST["action"]) && $_POST["action"] == "temperature-get-current"){
+if(isset($_POST["action"]) && $_POST["action"] == "temperature-get-current") {
     $sql = "SELECT * FROM bitrix_60.dozor_items WHERE ID = 23675";
     $res = $DB->Query($sql);
     while ($ar_fields = $res->GetNext()) {
@@ -34,7 +34,20 @@ if(isset($_POST["action"]) && $_POST["action"] == "temperature-get-current"){
     echo $current_temperature;
     /*$str = json_encode($current_temperature);
     echo $str;*/
-
+}elseif(isset($_POST["action"]) && $_POST["action"] == "temperature-get-state-triggers"){
+    $sql = "SELECT * FROM bitrix_60.dozor_triggers WHERE ID IN (13563, 13561)";
+    $res = $DB->Query($sql);
+    $arResult = array();
+    while ($ar_fields = $res->GetNext()) {
+        if($ar_fields["ID"] == 13563){
+            $arResult["red"] = $ar_fields["STATE_ACTIVE"];
+        }
+        if($ar_fields["ID"] == 13561){
+            $arResult["yellow"] = $ar_fields["STATE_ACTIVE"];
+        }
+    }
+    $str = json_encode($arResult);
+    echo $str;
 }else {
 
 

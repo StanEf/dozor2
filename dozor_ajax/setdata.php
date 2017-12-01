@@ -29,12 +29,14 @@ if(isset($_POST["action"]) && $_POST["action"] == "temperature-sensor-red"){
         WHERE ID = 23675
     ";
     $DB->Query($sql);
-}elseif(isset($_POST["action"]) && $_POST["action"] == "temperature-incremental"){
+}elseif(isset($_POST["action"]) && $_POST["action"] == "temperature-change"){
+
     $sql = "UPDATE bitrix_60.dozor_items
         SET VALUE = ".$_POST["value"]."
         WHERE ID = 23675
     ";
     $DB->Query($sql);
+
 }elseif(isset($_POST["action"]) && $_POST["action"] == "temperature-triggers-modify"){
     //red
     $sql = "UPDATE bitrix_60.dozor_triggers
