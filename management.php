@@ -256,7 +256,7 @@ function next(i, data){
        // setTimeout('newModifyTemperature', 1000, i, data);
         setTimeout(function(){
             newModifyTemperature(i, data);
-        }, 1000);
+        }, 2000);
     }
 }
 
@@ -281,6 +281,10 @@ function newModifyTemperature(i, data){
 }
 
 function newSetTriggerState(i, data){
+    var modify = 0;
+    console.log('in newSetTriggerState');
+    console.log(data);
+    console.log(i);
     if(data['arr_temperatures'][i] >= 85 && (data['trigger_yellow_state'] != 'Y' || data['trigger_red_state'] != 'Y')){
         trigger_red = 'Y';
         trigger_yellow = 'Y';
@@ -293,7 +297,9 @@ function newSetTriggerState(i, data){
         trigger_red = 'N';
         trigger_yellow = 'N';
         modify = 1;
-    }else{}
+    }else{
+        console.log('else');
+    }
 
     //conso
     if(modify == 1) {
@@ -302,10 +308,13 @@ function newSetTriggerState(i, data){
         console.log('newSetTriggerState current_state_trigger_yellow ' + data['trigger_yellow_state'] );
 
         newModifyTriggers(i, data);
+    }else{
+        next(i, data);
     }
 }
 
 function newModifyTriggers(i, data){
+    console.log('in newModifyTriggers');
     $.ajax({
         url: 'dozor_ajax/setdata.php',
         method: "POST",
@@ -440,19 +449,7 @@ function Event(type, params){
     this.type = type;
     this.params = params;
     if(this.type == 'temperature'){
-        this.startCyclicTimer2 = function(){
-            var delay = this.params['delay_before_update'];
 
-            var data = [];
-            data['arr_temperature'] = this.arrTemperatures;
-            data['trigger_red_state'] = this.triggers_state['red'];
-            data['trigger_yellow_state'] = this.triggers_state['yellow'];
-
-            var i = 0;
-            data['arr_temperature_length'] = data['arr_temperature'].length;
-
-            next(i, data);
-        }
 
 
         start(type, params);
