@@ -285,20 +285,28 @@ function newSetTriggerState(i, data){
     console.log('in newSetTriggerState');
     console.log(data);
     console.log(i);
-    if(data['arr_temperatures'][i] >= 85 && (data['trigger_yellow_state'] != 'Y' || data['trigger_red_state'] != 'Y')){
-        trigger_red = 'Y';
-        trigger_yellow = 'Y';
-        modify = 1;
-    }else if(data['arr_temperatures'][i] >= 55 && data['trigger_yellow_state'] != 'Y'){
-        trigger_red = 'N';
-        trigger_yellow = 'Y';
-        modify = 1;
-    }else if(data['trigger_yellow_state'] != 'N' || data['trigger_red_state'] != 'N'){
-        trigger_red = 'N';
-        trigger_yellow = 'N';
-        modify = 1;
+    console.log(data['arr_temperatures'][i]);
+    if(data['arr_temperatures'][i] >= 85){
+        if(data['trigger_red_state'] != 'Y')
+        {
+            data['trigger_red_state'] = 'Y';
+            data['trigger_yellow_state'] = 'Y';
+            modify = 1;
+        }
+    }else if(data['arr_temperatures'][i] >= 55){
+        if(data['trigger_red_state'] == 'Y' || data['trigger_yellow_state'] == 'N') {
+            data['trigger_red_state'] = 'N';
+            data['trigger_yellow_state'] = 'Y';
+            modify = 1;
+        }
     }else{
-        console.log('else');
+        if(data['trigger_yellow_state'] == 'Y' || data['trigger_red_state'] == 'Y') {
+            data['trigger_red_state'] = 'N';
+            data['trigger_yellow_state'] = 'N';
+            modify = 1;
+        }else {
+            console.log('else');
+        }
     }
 
     //conso
