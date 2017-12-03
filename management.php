@@ -103,9 +103,18 @@ $DB->Query($sql);*/
         <div class="col-md-4 block">
             <h2>Вода</h2>
             <br/>
-            <button type="button" class="btn  btn-bd-light">
-                Включить насос
+            <button type="button" class="btn  btn-bd-light water-sensor-red">
+                Красный
             </button>
+            <br/><br/>
+            <button type="button" class="btn  btn-bd-light water-sensor-yellow">
+                Желтый
+            </button>
+            <br/><br/>
+            <button type="button" class="btn  btn-bd-light water-sensor-green">
+                Зеленый
+            </button>
+            <br/><br/>
 
         </div>
     </div>
@@ -139,6 +148,24 @@ $(function () {
         console.log('');
         console.log('CLICK GREEN');
         changeTemperatureSensorToGreen();
+    });
+    $('.water-sensor-red').on('click', function(){
+        console.log('');
+        console.log('');
+        console.log('CLICK RED');
+        changeWaterSensorToRed();
+    });
+    $('.water-sensor-yellow').on('click', function(){
+        console.log('');
+        console.log('');
+        console.log('CLICK YELLOW');
+        changeWaterSensorToYellow();
+    });
+    $('.water-sensor-green').on('click', function(){
+        console.log('');
+        console.log('');
+        console.log('CLICK GREEN');
+        changeWaterSensorToGreen();
     });
 });
 
@@ -337,6 +364,44 @@ function newModifyTriggers(i, data){
     });
 }
 
+function changeWaterSensorToRed() {
+    var params;
+    params = {
+        'time_step'  : 4,
+        'delay_before_update' : 500,
+    };
+    var WaterRed = new Event('water', params);
+}
+
+function changeWaterSensorToYellow() {
+    var params;
+    params = {
+        'time_step'  : 4,
+        'delay_before_update' : 500,
+    };
+    var WaterYellow = new Event('water', params);
+}
+
+function changeWaterSensorToGreen() {
+    $.ajax({
+        url: 'dozor_ajax/getdata.php',
+        method: "POST",
+        data: {
+            action: "temperature-get-current"
+        },
+        success: function (data) {
+            var params;
+            params = {
+                'temperature_start' : parseFloat(data),
+                'temperature_final' : 20.1,
+                'temperature_step'  : 6,
+                'delay_before_update' : 500,
+            };
+            var WaterGreen = new Event('water', params);
+        }
+    });
+}
+
 function changeTemperatureSensorToRed() {
     var params;
     params = {
@@ -378,6 +443,8 @@ function changeTemperatureSensorToGreen() {
         }
     });
 }
+
+
 
 function getArrIterativeChangeTemperature(params){
     console.log('getArrIterativeChangeTemperature');
