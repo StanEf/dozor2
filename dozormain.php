@@ -883,11 +883,15 @@ $(function() {
         this.trigger_id_middle = trigger_id_middle;
         this.getTriggerState = function(data){
             console.log(data);
-            if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
-                this.trigger_state = 2;
-            } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
-                this.trigger_state = 1;
-            } else {
+            if(!$.isEmptyObject(data['trigger'])) {
+                if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
+                    this.trigger_state = 2;
+                } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
+                    this.trigger_state = 1;
+                } else {
+                    this.trigger_state = 0;
+                }
+            }else{
                 this.trigger_state = 0;
             }
         };

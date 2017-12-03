@@ -1102,11 +1102,15 @@
             this.trigger_id_high = trigger_id_high;
             this.trigger_id_middle = trigger_id_middle;
             this.getTriggerState = function(data){
-                if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
-                    this.trigger_state = 2;
-                } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
-                    this.trigger_state = 1;
-                } else {
+                if (!$.isEmptyObject(data['trigger'])) {
+                    if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
+                        this.trigger_state = 2;
+                    } else if (!$.isEmptyObject(data['trigger'][this.trigger_id_middle])) {
+                        this.trigger_state = 1;
+                    } else {
+                        this.trigger_state = 0;
+                    }
+                }else{
                     this.trigger_state = 0;
                 }
             };
@@ -1155,13 +1159,18 @@
              };
              */
             this.showGroupElements = function(){
-                if(this.trigger_state === 0){
-                    $(".indicator-pic.system-"+this.class_group).each(function(){
-                        $(this).attr("data-state", "1");
-                        console.log($(this));
-                    });
+                if($(".button-map-show-items-all").attr("data-selected") ==  "0") {
+                    if (this.trigger_state === 0) {
+                        $(".indicator-pic.system-" + this.class_group).each(function () {
+                            $(this).attr("data-state", "1");
+                        });
+                    } else {
+                        $(".indicator-pic.system-" + this.class_element).attr("data-state", "1");
+                    }
                 }else{
-                    $(".indicator-pic.system-"+this.class_element).attr("data-state", "1");
+                    $(".indicator-pic").each(function () {
+                        $(this).attr("data-state", "1");
+                    });
                 }
             };
             this.showGroupElements();
