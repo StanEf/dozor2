@@ -342,7 +342,7 @@ function changeTemperatureSensorToRed() {
     params = {
         'temperature_start' : 20.1,
         'temperature_final' : 85,
-        'temperature_step'  : 2,
+        'temperature_step'  : 4,
         'delay_before_update' : 500,
     };
     var TemperatureRed = new Event('temperature', params);
@@ -353,7 +353,7 @@ function changeTemperatureSensorToYellow() {
     params = {
         'temperature_start' : 20.1,
         'temperature_final' : 55,
-        'temperature_step'  : 2,
+        'temperature_step'  : 4,
         'delay_before_update' : 500,
     };
     var TemperatureYellow = new Event('temperature', params);
@@ -371,7 +371,7 @@ function changeTemperatureSensorToGreen() {
             params = {
                 'temperature_start' : parseFloat(data),
                 'temperature_final' : 20.1,
-                'temperature_step'  : 2,
+                'temperature_step'  : 6,
                 'delay_before_update' : 500,
             };
             var TemperatureGreen = new Event('temperature', params);
@@ -391,12 +391,12 @@ function getArrIterativeChangeTemperature(params){
     var arrTemperatures = [];
     for(var i=0; i<delta; i++){
         if(initial < final) {
-            current += 1.8 + Math.random() * 0.2;
+            current += 0.9 * stepTemperature + Math.random() * stepTemperature * 0.1;
             if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
                 arrTemperatures[i] = current;
             }
         }else{
-            current -= 1.8 + Math.random() * 0.2;
+            current -= 0.9 * stepTemperature + Math.random() * stepTemperature * 0.1;
             if(current > final){
                 arrTemperatures[i] = current;
             }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
