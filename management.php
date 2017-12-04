@@ -132,39 +132,39 @@ $DB->Query($sql);*/
 $(function () {
     $('[data-toggle="popover"]').popover({trigger:'hover'});
     $('.temperature-sensor-red').on('click', function(){
-        console.log('');
-        console.log('');
-        console.log('CLICK RED');
+        //console.log('');
+        //console.log('');
+        //console.log('CLICK RED');
         changeTemperatureSensorToRed();
     });
     $('.temperature-sensor-yellow').on('click', function(){
-        console.log('');
-        console.log('');
-        console.log('CLICK YELLOW');
+        //console.log('');
+        //console.log('');
+        //console.log('CLICK YELLOW');
         changeTemperatureSensorToYellow();
     });
     $('.temperature-sensor-green').on('click', function(){
-        console.log('');
-        console.log('');
-        console.log('CLICK GREEN');
+        //console.log('');
+        //console.log('');
+        //console.log('CLICK GREEN');
         changeTemperatureSensorToGreen();
     });
     $('.water-sensor-red').on('click', function(){
-        console.log('');
-        console.log('');
-        console.log('CLICK RED');
+        //console.log('');
+        //console.log('');
+        //console.log('CLICK RED');
         changeWaterSensorToRed();
     });
     $('.water-sensor-yellow').on('click', function(){
-        console.log('');
-        console.log('');
-        console.log('CLICK YELLOW');
+        //console.log('');
+        //console.log('');
+        //console.log('CLICK YELLOW');
         changeWaterSensorToYellow();
     });
     $('.water-sensor-green').on('click', function(){
-        console.log('');
-        console.log('');
-        console.log('CLICK GREEN');
+        //console.log('');
+        //console.log('');
+        //console.log('CLICK GREEN');
         changeWaterSensorToGreen();
     });
 });
@@ -172,7 +172,7 @@ $(function () {
 /*function getArrIterativeChangeTemperature(initial, final){
     var stepTemperature = 2;
     var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
-    console.log('initial '+ initial +' final '+ final +' delta ' + delta);
+    //console.log('initial '+ initial +' final '+ final +' delta ' + delta);
     var current = initial;
     var arrTemperatures = [];
     for(var i=0; i<delta; i++){
@@ -180,14 +180,14 @@ $(function () {
             current += 1.8 + Math.random() * 0.2;
             if((current < final) || (current - final >= 0 && current - final <= stepTemperature * 1.1)){
                 arrTemperatures[i] = current;
-                //console.log('current ' + current);
+                ////console.log('current ' + current);
             }
         }else{
             current -= 1.8 + Math.random() * 0.2;
-            //console.log('current ' + current);
+            ////console.log('current ' + current);
             if(current > final){
                 arrTemperatures[i] = current;
-                //console.log('current ' + current);
+                ////console.log('current ' + current);
             }else if(final - current >= 0 && final - current <= stepTemperature * 1.1){
                 if(arrTemperatures[i-1] != final) {
                     arrTemperatures[i] = final;
@@ -195,13 +195,13 @@ $(function () {
             }
         }
     }
-    console.log(arrTemperatures);
+    //console.log(arrTemperatures);
     return arrTemperatures;
 }*/
 
 function modifyTemperatureAndTriggersInDb(params_temperature){
-    console.log('modifyTemperatureAndTriggersInDb in ');
-    console.log(params_temperature);
+    //console.log('modifyTemperatureAndTriggersInDb in ');
+    //console.log(params_temperature);
     var i = params_temperature['index'];
     var arrTemperatures = params_temperature['arr_temperature'];
     $.ajax({
@@ -253,9 +253,9 @@ function setTriggersState(current_temperature, current_state_trigger_red, curren
 
     //conso
     if(modify == 1) {
-        console.log('setTriggersState current_temperature' +current_temperature );
-        console.log('setTriggersState current_state_trigger_red ' +current_state_trigger_red );
-        console.log('setTriggersState current_state_trigger_yellow ' +current_state_trigger_yellow );
+        //console.log('setTriggersState current_temperature' +current_temperature );
+        //console.log('setTriggersState current_state_trigger_red ' +current_state_trigger_red );
+        //console.log('setTriggersState current_state_trigger_yellow ' +current_state_trigger_yellow );
 
         modifyTemperatureTriggersInDb(trigger_red, trigger_yellow);
     }
@@ -269,15 +269,15 @@ function getTemperatureCurrent(){
         action: "temperature-get-current"
      },
      success: function (data) {
-        console.log(data);
+        //console.log(data);
         return data;
      }
      });
 }
 function next(i, data){
-    console.log('in NEXT');
-    console.log('i ' + i);
-    console.log(data);
+    //console.log('in NEXT');
+    //console.log('i ' + i);
+    //console.log(data);
     i = i + 1;
     if(i < data['arr_temperatures_length']){
        // setTimeout('newModifyTemperature', 1000, i, data);
@@ -288,9 +288,9 @@ function next(i, data){
 }
 
 function newModifyTemperature(i, data){
-    console.log('newModifyTemperature');
-    console.log(i);
-    console.log(data);
+    //console.log('newModifyTemperature');
+    //console.log(i);
+    //console.log(data);
     var arrTemperatures = data['arr_temperatures'];
     $.ajax({
         url: 'dozor_ajax/setdata.php',
@@ -309,10 +309,10 @@ function newModifyTemperature(i, data){
 
 function newSetTriggerState(i, data){
     var modify = 0;
-    console.log('in newSetTriggerState');
-    console.log(data);
-    console.log(i);
-    console.log(data['arr_temperatures'][i]);
+    //console.log('in newSetTriggerState');
+    //console.log(data);
+    //console.log(i);
+    //console.log(data['arr_temperatures'][i]);
     if(data['arr_temperatures'][i] >= 85){
         if(data['trigger_red_state'] != 'Y')
         {
@@ -332,15 +332,15 @@ function newSetTriggerState(i, data){
             data['trigger_yellow_state'] = 'N';
             modify = 1;
         }else {
-            console.log('else');
+            //console.log('else');
         }
     }
 
     //conso
     if(modify == 1) {
-        console.log('newSetTriggerState current_temperature' + data['arr_temperatures'][i] );
-        console.log('newSetTriggerState current_state_trigger_red ' + data['trigger_red_state'] );
-        console.log('newSetTriggerState current_state_trigger_yellow ' + data['trigger_yellow_state'] );
+        //console.log('newSetTriggerState current_temperature' + data['arr_temperatures'][i] );
+        //console.log('newSetTriggerState current_state_trigger_red ' + data['trigger_red_state'] );
+        //console.log('newSetTriggerState current_state_trigger_yellow ' + data['trigger_yellow_state'] );
 
         newModifyTriggers(i, data);
     }else{
@@ -349,7 +349,7 @@ function newSetTriggerState(i, data){
 }
 
 function newModifyTriggers(i, data){
-    console.log('in newModifyTriggers');
+    //console.log('in newModifyTriggers');
     $.ajax({
         url: 'dozor_ajax/setdata.php',
         method: "POST",
@@ -441,13 +441,13 @@ function changeTemperatureSensorToGreen() {
 
 
 function getArrIterativeChangeTemperature(params){
-    console.log('getArrIterativeChangeTemperature');
-    console.log(params);
+    //console.log('getArrIterativeChangeTemperature');
+    //console.log(params);
     var initial = params['temperature_start'];
     var final = params['temperature_final'];
     var stepTemperature = params['temperature_step'];
     var delta = Math.ceil(Math.abs(final - initial)/stepTemperature)+3;
-    console.log('4initial '+ initial +' final '+ final +' delta ' + delta);
+    //console.log('4initial '+ initial +' final '+ final +' delta ' + delta);
     var current = initial;
     var arrTemperatures = [];
     for(var i=0; i<delta; i++){
@@ -468,8 +468,8 @@ function getArrIterativeChangeTemperature(params){
         }
     }
     params['arr_temperatures'] = arrTemperatures;
-    console.log('getArrIterativeChangeTemperature finish params');
-    console.log(params);
+    //console.log('getArrIterativeChangeTemperature finish params');
+    //console.log(params);
     return params;
 }
 
@@ -482,32 +482,32 @@ function startTemperature(params){
             action: "temperature-get-state-triggers"
         },
         success: function (request) {
-            console.log('getStateTriggers');
+            //console.log('getStateTriggers');
             /*this.triggers_state = JSON.parse(data);
-             console.log(this.triggers_state);*/
+             //console.log(this.triggers_state);*/
             request = JSON.parse(request);
-            console.log(request);
-            console.log('');
-            console.log('');
-            console.log(params);
+            //console.log(request);
+            //console.log('');
+            //console.log('');
+            //console.log(params);
             params['trigger_red_state'] = request['red'];
             params['trigger_yellow_state'] = request['yellow'];
 
 
             params = getArrIterativeChangeTemperature(params);
-            console.log('');
-            console.log('');
+            //console.log('');
+            //console.log('');
 
             var i = 0;
             params['arr_temperatures_length'] = params['arr_temperatures'].length;
-            console.log(params);
+            //console.log(params);
             next(i, params);
         }
     });
 
     //alert(request);
-    /*console.log('request');
-     console.log(request);
+    /*//console.log('request');
+     //console.log(request);
      this.triggers_state = JSON.parse(request);
      this.getArrIterativeChangeTemperature();*/
 }
@@ -528,7 +528,7 @@ function setWaterTrigger(trigger_red, trigger_yellow){
 }
 
 function startWaterChange(params){
-    console.log(params);
+    //console.log(params);
     if(params['state'] == 'green'){
         if(params['trigger_state_red'] == 'Y'){
             setTimeout(function(){

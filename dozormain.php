@@ -759,7 +759,7 @@ $(function() {
     }
     if(! jQuery.browser.mobile){
         $(".col-right-item-pic-icon.work").on("mouseenter", function(){
-            console.log("click");
+            //console.log("click");
             if($(this).hasClass("water")){
             $(".window-pop-up .item-scheme").html("<a href='/dozorfloor0.php?system=water'> Показать схему </a>");
             }else{
@@ -769,22 +769,22 @@ $(function() {
 
             var total_container_width = $('body').width();
             var total_container_height = $('body').height();
-            console.log('total_container_width ' + total_container_width);
-            console.log('total_container_height ' + total_container_height);
+            //console.log('total_container_width ' + total_container_width);
+            //console.log('total_container_height ' + total_container_height);
             var parent = $(this).closest('.col-right-item-pic');
             var elem_coord = this.getBoundingClientRect();
             //var elem_coord = $(".col-right-item-pic-icon.work.ww").getBoundingClientRect();
 
-            console.log(' elem_coord icon_right ' + elem_coord.right);
-            console.log(' elem_coord icon_top ' + elem_coord.top);
+            //console.log(' elem_coord icon_right ' + elem_coord.right);
+            //console.log(' elem_coord icon_top ' + elem_coord.top);
 
             var icon_right = elem_coord.right;
             var icon_top = elem_coord.top;
 
             var window_pop_up_width = 320;
             var window_pop_up_height = 215;
-            console.log('window_pop_up_height ' + window_pop_up_height);
-            console.log('window_pop_up_width ' + window_pop_up_width);
+            //console.log('window_pop_up_height ' + window_pop_up_height);
+            //console.log('window_pop_up_width ' + window_pop_up_width);
 
             var popup_corner_left = icon_right;
             popup_corner_left = popup_corner_left + 'px';
@@ -796,10 +796,10 @@ $(function() {
             var popup_corner_bottom = total_container_height - icon_top - window_pop_up_height;
             popup_corner_bottom = popup_corner_bottom + 'px';
 
-            console.log('popup_corner_left ' + popup_corner_left);
-            console.log('popup_corner_right ' + popup_corner_right);
-            console.log('popup_corner_top ' + popup_corner_top);
-            console.log('popup_corner_bottom ' + popup_corner_bottom);
+            //console.log('popup_corner_left ' + popup_corner_left);
+            //console.log('popup_corner_right ' + popup_corner_right);
+            //console.log('popup_corner_top ' + popup_corner_top);
+            //console.log('popup_corner_bottom ' + popup_corner_bottom);
 
             $(".window-pop-up").css('left', popup_corner_left);
             $(".window-pop-up").css('top', popup_corner_top);
@@ -816,7 +816,7 @@ $(function() {
         });
 
         $(".col-right-item-pic-icon.work").on("mouseleave", function(){
-            console.log("mouseout");
+            //console.log("mouseout");
             if($(".window-pop-up").hasClass('display_block')) {
                 $(".window-pop-up").removeClass('display_block');
             }
@@ -826,7 +826,7 @@ $(function() {
         });
 
         $('.window-pop-up').on('mouseenter', function(){
-            console.log("window-pop-up mouseenter");
+            //console.log("window-pop-up mouseenter");
             if($(".window-pop-up").hasClass('display_none')) {
                 $(".window-pop-up").removeClass('display_none');
                 $(".window-pop-up").addClass('display_block')
@@ -834,7 +834,7 @@ $(function() {
         });
 
         $('.window-pop-up').on('mouseleave', function(){
-            console.log("window-pop-up mouseenter");
+            //console.log("window-pop-up mouseenter");
             if($(".window-pop-up").hasClass('display_block')) {
                 $(".window-pop-up").removeClass('display_block');
                 $(".window-pop-up").addClass('display_none');
@@ -847,27 +847,27 @@ $(function() {
 
     }else{
         $(".col-right-item-pic-icon.work").on("click", function(){
-            /*console.log("click");*/
+            /*//console.log("click");*/
             $(".window-pop-up").show();
         });
         $(".item-pop-up-exit").on("click", function(){
-            console.log("click");
+            //console.log("click");
             $(".window-pop-up").hide();
         });
     }
     $(".col-left-logo-inner").on("click", function(){
-        console.log("click");
+        //console.log("click");
         window.open("/maps.php");
     });
 
 	 $(".col-left-logo-inner").on("click", function(){
-        console.log("click");
+        //console.log("click");
         window.open("/maps.php");
     });
 
     fetchData();
     setInterval(function() {
-        console.log('fetch data');
+        //console.log('fetch data');
         fetchData();
     }, 1500);
 
@@ -882,7 +882,7 @@ $(function() {
         this.trigger_id_high = trigger_id_high;
         this.trigger_id_middle = trigger_id_middle;
         this.getTriggerState = function(data){
-            console.log(data);
+            //console.log(data);
             if(!$.isEmptyObject(data['trigger'])) {
                 if (!$.isEmptyObject(data['trigger'][this.trigger_id_high])) {
                     this.trigger_state = 2;
@@ -1007,7 +1007,7 @@ $(function() {
             url: 'dozor_ajax/getdata.php',
             success: function (data) {
                 var obj = jQuery.parseJSON(data);
-                console.log(obj);
+                //console.log(obj);
                 //obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
                 //obj['trigger'][13589] = {'triggerid': 1, 1: 2}; // верхний бак пустой
                 var Water = new Item('water', '13591', '13589', obj);

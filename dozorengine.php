@@ -858,7 +858,7 @@
 <script>
 function resizeMap(){
 	var height = $(".map-container-map-inner-img").height();
-	console.log(height);
+	//console.log(height);
 	height = height + 'px';
 	$(".map-container-map-inner-img").width(height);
 }
@@ -923,7 +923,7 @@ function Item(class_category, class_group, class_element, trigger_id_high, trigg
 		if(this.trigger_state === 0){
 			$(".indicator-pic.system-"+this.class_group).each(function(){
 				$(this).attr("data-state", "1");
-				console.log($(this));
+				//console.log($(this));
 			});
 		}else{
 			$(".indicator-pic.system-"+this.class_element).attr("data-state", "1");
@@ -942,15 +942,15 @@ function Item(class_category, class_group, class_element, trigger_id_high, trigg
 		}
 	};
 	this.changeStateIndicatorTemperature(data);
-	console.log(' ');
-	console.log("this.class_category " + this.class_category);
-	console.log("this.class_group " + this.class_group);
-	console.log("this.class_element " + this.class_element);
-	console.log("this.trigger_id_high " + this.trigger_id_high);
-	console.log("this.trigger_id_middle " + this.trigger_id_middle);
-	console.log("this.trigger_state " + this.trigger_state);
-	console.log("this.indicator_color " + this.indicator_color);
-	console.log("this.counter_error " + this.counter_error);
+	//console.log(' ');
+	//console.log("this.class_category " + this.class_category);
+	//console.log("this.class_group " + this.class_group);
+	//console.log("this.class_element " + this.class_element);
+	//console.log("this.trigger_id_high " + this.trigger_id_high);
+	//console.log("this.trigger_id_middle " + this.trigger_id_middle);
+	//console.log("this.trigger_state " + this.trigger_state);
+	//console.log("this.indicator_color " + this.indicator_color);
+	//console.log("this.counter_error " + this.counter_error);
 }
 	
 $(function() {
@@ -972,26 +972,26 @@ $(function() {
     }
 	
 	if(! jQuery.browser.mobile){
-		console.log('not mobile');
+		//console.log('not mobile');
 		$(".col-right-item-pic-icon").on("mouseenter", function(){
-			console.log("click");
+			//console.log("click");
 			var total_container_width = $('.map-container-map-inner-img').width();
 			var total_container_height = $('.map-container-map-inner-img').height();
-			console.log('total_container_width ' + total_container_width);
-			console.log('total_container_height ' + total_container_height);
+			//console.log('total_container_width ' + total_container_width);
+			//console.log('total_container_height ' + total_container_height);
 
 			var parent = $(".col-right-item-pic-icon").closest('.indicator-pic');
 
-			console.log('icon_left ' + parent.css('left'));
-			console.log('icon_top ' + parent.css('top'));
+			//console.log('icon_left ' + parent.css('left'));
+			//console.log('icon_top ' + parent.css('top'));
 
 			var icon_left = parseInt(parent.css('left'));
 			var icon_top = parseInt(parent.css('top'));
 
 			var window_pop_up_width = 320;
 			var window_pop_up_height = 215;
-			console.log('window_pop_up_height ' + window_pop_up_height);
-			console.log('window_pop_up_width ' + window_pop_up_width);
+			//console.log('window_pop_up_height ' + window_pop_up_height);
+			//console.log('window_pop_up_width ' + window_pop_up_width);
 			var popup_corner_left = icon_left - window_pop_up_width;
 			popup_corner_left = popup_corner_left + 'px';
 			var popup_corner_right = total_container_width - icon_left;
@@ -1000,10 +1000,10 @@ $(function() {
 			var popup_corner_bottom = total_container_height - icon_top - window_pop_up_height;
 			popup_corner_bottom = popup_corner_bottom + 'px';
 
-			console.log('popup_corner_left ' + popup_corner_left);
-			console.log('popup_corner_right ' + popup_corner_right);
-			console.log('popup_corner_top ' + popup_corner_top);
-			console.log('popup_corner_bottom ' + popup_corner_bottom);
+			//console.log('popup_corner_left ' + popup_corner_left);
+			//console.log('popup_corner_right ' + popup_corner_right);
+			//console.log('popup_corner_top ' + popup_corner_top);
+			//console.log('popup_corner_bottom ' + popup_corner_bottom);
 
 			$(".window-pop-up").css('left', popup_corner_left);
 			$(".window-pop-up").css('top', popup_corner_top);
@@ -1020,7 +1020,7 @@ $(function() {
 		});
 
 		$(".col-right-item-pic-icon").on("mouseleave", function(){
-			console.log("mouseout");
+			//console.log("mouseout");
 			if($(".window-pop-up").hasClass('display_block')) {
 				$(".window-pop-up").removeClass('display_block');
 			}
@@ -1030,7 +1030,7 @@ $(function() {
 		});
 
 		$('.window-pop-up').on('mouseenter', function(){
-			console.log("window-pop-up mouseenter");
+			//console.log("window-pop-up mouseenter");
 			if($(".window-pop-up").hasClass('display_none')) {
 				$(".window-pop-up").removeClass('display_none');
 				$(".window-pop-up").addClass('display_block')
@@ -1038,7 +1038,7 @@ $(function() {
 		});
 
 		$('.window-pop-up').on('mouseleave', function(){
-			console.log("window-pop-up mouseenter");
+			//console.log("window-pop-up mouseenter");
 			if($(".window-pop-up").hasClass('display_block')) {
 				$(".window-pop-up").removeClass('display_block');
 				$(".window-pop-up").addClass('display_none')
@@ -1046,7 +1046,7 @@ $(function() {
 		});
 	}else{
 		$(".col-right-item-pic-icon").on("click", function(){
-			/*console.log("click");*/
+			/*//console.log("click");*/
 			$(".window-pop-up").show();
 		});
 	}
@@ -1054,7 +1054,7 @@ $(function() {
 });
 	
 setInterval(function() {
-	console.log('fetch data');
+	//console.log('fetch data');
 	fetchData();
 }, 2000);
 
@@ -1063,7 +1063,7 @@ function fetchData() {
 		url: 'dozor_ajax/getdata.php',
 		success: function (data) {
 			var obj = jQuery.parseJSON(data);
-			console.log(obj);
+			//console.log(obj);
 			//obj['trigger'][13591] = {'triggerid' : 1, 1: 2}; // верхний бак переполнен
 			//obj['trigger'][13589] = {'triggerid': 1, 1: 2}; // верхний бак пустой
 			var Water = new Item('engineering-complex', 'water', 'water-0', '13591', '13589', obj);
@@ -1079,7 +1079,7 @@ function fetchData() {
 			// $('.indicator-temperature-number-small').text('.' + lastvalueArr2[0]);
 			// var temp_indicator_color;
 
-			// console.log(obj['trigger']);
+			// //console.log(obj['trigger']);
 
 			// if (!$.isEmptyObject(obj['trigger'][13564])) {
 				// temp_indicator_color = '#bb6767';
@@ -1089,7 +1089,7 @@ function fetchData() {
 				// temp_indicator_color = '#00a070';
 			// }
 
-			// console.log('temp_indicator_color ' + temp_indicator_color);
+			// //console.log('temp_indicator_color ' + temp_indicator_color);
 
 			// $('.col-right-item-pic-icon-indicator-temperature').css('background', temp_indicator_color);
 			// $('.col-right-item-pic-icon').css('background', temp_indicator_color);
@@ -1111,7 +1111,7 @@ function fetchData() {
 };
 
 $(".col-left-logo-inner").on("click", function(){
-	console.log("click");
+	//console.log("click");
 	window.open("/maps.php");
 });
 
