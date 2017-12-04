@@ -1430,7 +1430,7 @@ echo '</pre>000';*/
                                 </div>
                             </div>
 
-                            <div class="indicator-pic system-fire-fighting" data-state="0">
+                            <div class="indicator-pic system-fire-fighting system-temperature system-temperature-0" data-state="0">
                                 <div class="col-right-item-pic">
                                     <div class="col-right-item-pic-icon">
                                         <div>
