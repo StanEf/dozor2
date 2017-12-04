@@ -1,4 +1,6 @@
 <? require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
+header("Location: http://dozor2.localhost.ru/dozormain.php");
+exit();
 $APPLICATION->SetPageProperty("title", "Нордик Инжиниринг");
 $APPLICATION->SetPageProperty("keywords", "главная, нордик инжиниринг");
 $APPLICATION->SetPageProperty("description", "Главная страница");

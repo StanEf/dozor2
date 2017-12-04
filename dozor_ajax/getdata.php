@@ -48,7 +48,25 @@ if(isset($_POST["action"]) && $_POST["action"] == "temperature-get-current") {
     }
     $str = json_encode($arResult);
     echo $str;
-}else {
+}elseif(isset($_POST["action"]) && $_POST["action"] == "water-get-current-state"){
+    $sql = "SELECT * FROM bitrix_60.dozor_triggers WHERE ID IN (13591, 13589)";
+    $res = $DB->Query($sql);
+    $arResult = array();
+    while ($ar_fields = $res->GetNext()) {
+        if($ar_fields["ID"] == 13591){
+            $arResult["red"] = $ar_fields["STATE_ACTIVE"];
+        }
+        if($ar_fields["ID"] == 13589){
+            $arResult["yellow"] = $ar_fields["STATE_ACTIVE"];
+        }
+    }
+    /*if(!isset($arResult["red"]) || !isset($arResult["yellow"])){
+
+    }*/
+    $str = json_encode($arResult);
+    echo $str;
+}
+else {
 
 
     $arResult = array();

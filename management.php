@@ -101,18 +101,18 @@ $DB->Query($sql);*/
             </button>
         </div>
         <div class="col-md-4 block">
-            <h2>Вода</h2>
+            <h2>Давление в системе</h2>
             <br/>
             <button type="button" class="btn  btn-bd-light water-sensor-red">
-                Красный
+                Критическое
             </button>
             <br/><br/>
             <button type="button" class="btn  btn-bd-light water-sensor-yellow">
-                Желтый
+                Ниже рабочего
             </button>
             <br/><br/>
             <button type="button" class="btn  btn-bd-light water-sensor-green">
-                Зеленый
+                В норме
             </button>
             <br/><br/>
 
@@ -365,39 +365,33 @@ function newModifyTriggers(i, data){
 }
 
 function changeWaterSensorToRed() {
-    var params;
-    params = {
-        'time_step'  : 4,
-        'delay_before_update' : 500,
-    };
-    var WaterRed = new Event('water', params);
+    getCurrentWaterState('red');
 }
 
 function changeWaterSensorToYellow() {
-    var params;
-    params = {
-        'time_step'  : 4,
-        'delay_before_update' : 500,
-    };
-    var WaterYellow = new Event('water', params);
+    getCurrentWaterState('yellow');
 }
 
 function changeWaterSensorToGreen() {
+    getCurrentWaterState('green');
+}
+
+function getCurrentWaterState(state){
     $.ajax({
         url: 'dozor_ajax/getdata.php',
         method: "POST",
         data: {
-            action: "temperature-get-current"
+            action: "water-get-current-state"
         },
-        success: function (data) {
+        success: function (request) {
+            request = JSON.parse(request);
             var params;
             params = {
-                'temperature_start' : parseFloat(data),
-                'temperature_final' : 20.1,
-                'temperature_step'  : 6,
-                'delay_before_update' : 500,
+                'state' : state,
+                'trigger_state_red' : request['red'],
+                'trigger_state_yellow' : request['yellow']
             };
-            var WaterGreen = new Event('water', params);
+            var Water = new Event('water', params);
         }
     });
 }
@@ -479,7 +473,7 @@ function getArrIterativeChangeTemperature(params){
     return params;
 }
 
-function start(type, params){
+function startTemperature(params){
     $.ajax({
         url: 'dozor_ajax/getdata.php',
         method: "POST",
@@ -518,18 +512,111 @@ function start(type, params){
      this.getArrIterativeChangeTemperature();*/
 }
 
+function setWaterTrigger(trigger_red, trigger_yellow){
+    $.ajax({
+        url: 'dozor_ajax/setdata.php',
+        method: "POST",
+        data: {
+            action: "water-triggers-modify",
+            trigger_red: trigger_red,
+            trigger_yellow: trigger_yellow
+        },
+        success: function (data) {
+
+        }
+    });
+}
+
+function startWaterChange(params){
+    console.log(params);
+    if(params['state'] == 'green'){
+        if(params['trigger_state_red'] == 'Y'){
+            setTimeout(function(){
+                $.ajax({
+                    url: 'dozor_ajax/setdata.php',
+                    method: "POST",
+                    data: {
+                        action: "water-triggers-modify",
+                        trigger_red: 'N',
+                        trigger_yellow: 'Y'
+                    },
+                    success: function (data) {
+                        setTimeout(function(){
+                            $.ajax({
+                                url: 'dozor_ajax/setdata.php',
+                                method: "POST",
+                                data: {
+                                    action: "water-triggers-modify",
+                                    trigger_red: 'N',
+                                    trigger_yellow: 'N'
+                                },
+                                success: function (data) {
+
+                                }
+                            });
+                        }, 3000);
+                    }
+                });
+            }, 3000);
+        }else if(params['trigger_state_yellow'] == 'Y'){
+            setTimeout(function(){
+                $.ajax({
+                    url: 'dozor_ajax/setdata.php',
+                    method: "POST",
+                    data: {
+                        action: "water-triggers-modify",
+                        trigger_red: 'N',
+                        trigger_yellow: 'N'
+                    },
+                    success: function (data) {
+
+                    }
+                });
+            }, 3000);
+        }
+    }else if(params['state'] == 'yellow'){
+        setTimeout(function(){
+            $.ajax({
+                url: 'dozor_ajax/setdata.php',
+                method: "POST",
+                data: {
+                    action: "water-triggers-modify",
+                    trigger_red: 'N',
+                    trigger_yellow: 'Y'
+                },
+                success: function (data) {
+
+                }
+            });
+        }, 500);
+    }else if(params['state'] == 'red'){
+        setTimeout(function(){
+            $.ajax({
+                url: 'dozor_ajax/setdata.php',
+                method: "POST",
+                data: {
+                    action: "water-triggers-modify",
+                    trigger_red: 'Y',
+                    trigger_yellow: 'Y'
+                },
+                success: function (data) {
+
+                }
+            });
+        }, 500);
+    }else{}
+}
+
+
 
 
 function Event(type, params){
     this.type = type;
     this.params = params;
     if(this.type == 'temperature'){
-
-
-
-        start(type, params);
-
-
+        startTemperature(params);
+    }else if(this.type == 'water'){
+        startWaterChange(params);
     }
 }
 
